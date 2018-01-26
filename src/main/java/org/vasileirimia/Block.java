@@ -10,16 +10,19 @@ public class Block {
     private String previousHash;
     private String data;
     private long timestamp;
+    int nonce;
+    public static int difficulty = 5;
 
     public Block(String previousHash, String data, long timestamp) {
         this.previousHash = previousHash;
         this.data = data;
         this.timestamp = timestamp;
-        hash = computeHash();
+
+        mineBlock(difficulty);
     }
 
     public String computeHash() {
-        return applySha256(previousHash + Long.toString(timestamp) + data);
+        return applySha256(previousHash + Long.toString(timestamp) + Integer.toString(nonce) + data);
     }
 
     public String getHash() {
@@ -46,5 +49,15 @@ public class Block {
         catch(Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void mineBlock(int difficulty) {
+        String target = new String(new char[difficulty]).replace('\0', '0'); //Create a string with difficulty * "0"
+        do{
+            nonce++;
+            hash = computeHash();
+        }while(!hash.substring( 0, difficulty).equals(target));
+
+        System.out.println("Block Mined!!! : " + hash);
     }
 }
